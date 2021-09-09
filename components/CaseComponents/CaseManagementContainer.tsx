@@ -19,8 +19,11 @@ import AddCategoryModal from "./Modals/AddCategoryModal";
   in this variable 
 */
 export const ManagementContainerQuery = `
-query MyQuery {
-  __typename 
+query QueryCases {
+  category {
+    name
+    id
+  }
 }
 `;
 // END TODO
@@ -41,6 +44,9 @@ const CaseManagementContainer: React.FC = (props) => {
     query: ManagementContainerQuery,
   });
 
+  //const caseCategory: CaseCategoryData | null = data ? data?.category[0] : null;
+
+
   return (
     <>
       <h5 className="title">Home Page</h5>
@@ -50,7 +56,13 @@ const CaseManagementContainer: React.FC = (props) => {
           Use the data from the result of the query to render 
           a CaseCategory for every category in the response.
           Remember, the response is stored in the "data" variable!
-        */}
+        */
+       //change text size and stuff
+        <h3 className="font-weight-normal t4sg-color text-center"> 
+          {data.name} {data.id}
+        </h3>
+
+        }
 
         {/* END TODO */}
       </Grid>
