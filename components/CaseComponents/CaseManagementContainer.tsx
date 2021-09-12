@@ -75,7 +75,7 @@ const CaseManagementContainer: React.FC = (props) => {
           >      
 
               {data
-              ? data.category.map((category, index: number) => {
+              ? data.category.map((category: any, index: number) => {
                   return <Grid item xs={4} >
                   <CaseCategory key={index} category_id={category.id} />
                   </Grid> 

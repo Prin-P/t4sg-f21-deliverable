@@ -82,7 +82,7 @@ const EditCaseModal: React.FC<EditCaseModalProps> = (props) => {
             >
               
               {data
-                ? data.category.map((category, index:number) => {
+                ? data.category.map((category: any, index:number) => {
                   return <MenuItem key={index} value={category.id}>
                     {category.name} 
                   </MenuItem>
@@ -167,7 +167,7 @@ const EditCaseModal: React.FC<EditCaseModalProps> = (props) => {
             >
             
               {data
-                ? data.category.map((category, index:number) => {
+                ? data.category.map((category: any, index:number) => {
                   return <MenuItem key={index} value={category.id}>
                     {category.name} 
                   </MenuItem>
