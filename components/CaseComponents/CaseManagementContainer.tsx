@@ -1,11 +1,13 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import { Container } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 import Grid, { GridSpacing } from "@material-ui/core/Grid";
 import "../../styles/casemanagement.module.css";
 import Footer from "./Footer";
 import CaseCategory from "./CaseCategory";
 import AddCaseModal from "./Modals/AddCaseModal";
+import EditCaseModal from "./Modals/EditCaseModal";
+import DeleteCaseModal from "./Modals/DeleteCaseModal";
 import { useQuery } from "urql";
 import AddCategoryModal from "./Modals/AddCategoryModal";
 
@@ -33,10 +35,16 @@ export type ManagementCategory = {
   name: string;
 };
 
+const reload=()=>window.location.reload();
+
 const CaseManagementContainer: React.FC = (props) => {
   const [addCaseModalOpen, setAddCaseModalOpen] =
     React.useState<boolean>(false);
   const [addCategoryModalOpen, setAddCategoryModalOpen] =
+    React.useState<boolean>(false);
+  const [editCaseModalOpen, setEditCaseModalOpen] =
+    React.useState<boolean>(false);
+  const [deleteCaseModalOpen, setDeleteCaseModalOpen] =
     React.useState<boolean>(false);
 
   /* NOTE: This uses */
@@ -44,62 +52,99 @@ const CaseManagementContainer: React.FC = (props) => {
     query: ManagementContainerQuery,
   });
 
-  //const caseCategory: CaseCategoryData | null = data ? data?.category[0] : null;
-
-
   return (
     <>
       <h5 className="title">Home Page</h5>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} >
         {/*
           FEATURE 1 TODO:
           Use the data from the result of the query to render 
           a CaseCategory for every category in the response.
           Remember, the response is stored in the "data" variable!
         */
-       //change text size and stuff
-        <h3 className="font-weight-normal t4sg-color text-center"> 
-          {data.name} {data.id}
-        </h3>
 
-        }
+        <Container
+          style={{ width: "100%", borderStyle: "solid", padding: "0.75rem",marginTop: "0.75rem", }}
+        >
+
+          <Grid
+            container spacing={3}
+            direction="row"
+            justifyContent="space-evenly"
+            alignItems="flex-start"
+          >      
+
+              {data
+              ? data.category.map((category, index: number) => {
+                  return <Grid item xs={4} >
+                  <CaseCategory key={index} category_id={category.id} />
+                  </Grid> 
+                })
+              : "Something went wrong"}
+
+          </Grid> 
+
+        </Container>
+
+            }
 
         {/* END TODO */}
       </Grid>
 
       <AddCaseModal
-        onClose={() => setAddCaseModalOpen(false)}
+        onClose={() => {setAddCaseModalOpen(false),
+          window.location.reload()}}
         open={addCaseModalOpen}
       />
 
       <AddCategoryModal
-        onClose={() => setAddCategoryModalOpen(false)}
+        onClose={() => {setAddCategoryModalOpen(false), 
+          window.location.reload()}}
         open={addCategoryModalOpen}
       />
 
+      <EditCaseModal
+        onClose={() => {setEditCaseModalOpen(false), 
+          window.location.reload()}}
+        open={editCaseModalOpen}
+      />  
+
+      <DeleteCaseModal
+        onClose={() => {setDeleteCaseModalOpen(false), 
+          window.location.reload()}}
+        open={deleteCaseModalOpen}
+      />  
+
       <Container
         style={{
-          width: "100%",
-          borderStyle: "solid",
+          width: "45%",
           padding: "0.75rem",
           marginTop: "0.75rem",
+          justifyContent:'flex-end',
+          alignItems:'spaced-evenly',
+         
         }}
       >
         <Button variant="dark" onClick={() => setAddCategoryModalOpen(true)}>
           Add Category
-        </Button>
+        </Button>{' '}
+
         <Button variant="dark" onClick={() => "redirect"}>
           Delete Category
-        </Button>
+        </Button>{' '}
+
         <Button variant="dark" onClick={() => setAddCaseModalOpen(true)}>
           Add Case
-        </Button>
-        <Button variant="dark" onClick={() => "redirect"}>
+        </Button>{' '}
+
+        <Button variant="dark" onClick={() => setDeleteCaseModalOpen(true)}>
           Delete Case
-        </Button>
-        <Button variant="dark" onClick={() => "redirect"}>
+        </Button>{' '}
+
+        <Button variant="dark" onClick={() => setEditCaseModalOpen(true)}>
           Edit Case
-        </Button>
+        </Button>{' '}
+
       </Container>
     </>
   );

@@ -17,6 +17,8 @@ import {
   ManagementContainerQuery,
 } from "../CaseManagementContainer";
 
+//Extra feature
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -31,33 +33,25 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type AddCaseModalProps = {
+type EditCaseModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
-/* 
-  FEATURE 2 TODO:
-  Write a mutation that will insert (add) a new case given the
-  description, name, status, and category_id.
-  
-  Make sure to replace the string that is currently
-  in this variable 
-*/
-const InsertCaseMutation = `
-mutation AddCaseMutation($status: String = "", $category_id: Int = 10, $description: String = "", $name: String = "") {
-  insert_cases_one(object: {description: $description, name: $name, status: $status, category_id: $category_id}) {
-    description
-    name
-    status
-    category_id
+const EditCaseMutation = `
+
+mutation EditCaseMutation($nameCase: String = "", $nameCat: bigint = "", $category_id: Int = 10, $description: String = "", $name: String = "", $status: String = "") {
+  update_cases(where: {_and: {name: {_eq: $nameCase}, category: {id: {_eq: $nameCat}}}}, _set: {category_id: $category_id, description: $description, name: $name, status: $status}) {
+    affected_rows
   }
 }
 `;
-// END TODO
 
-const AddCaseModal: React.FC<AddCaseModalProps> = (props) => {
+
+const EditCaseModal: React.FC<EditCaseModalProps> = (props) => {
   const classes = useStyles();
+  const [nameCat, setNameCat] = useState<number | null>(null);
+  const [nameCase, setNameCase] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
@@ -66,14 +60,57 @@ const AddCaseModal: React.FC<AddCaseModalProps> = (props) => {
     query: ManagementContainerQuery,
   });
 
-  const [result, executeMutation] = useMutation(InsertCaseMutation);
+  const [result, executeMutation] = useMutation(EditCaseMutation);
 
   return (
     <StyledModal open={props.open} onClose={props.onClose}>
       <Typography variant="h4" align="center">
-        Add New Case
+        Edit Case
       </Typography>
       <Box>
+
+        {data ? (
+          <FormControl fullWidth>
+            <InputLabel id="category-select-label">Category of case to be changed</InputLabel>
+            <Select
+              labelId="category-select-label"
+              fullWidth
+              value={nameCat}
+              onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                setNameCat(event.target.value as number);
+              }}
+            >
+              
+              {data
+                ? data.category.map((category, index:number) => {
+                  return <MenuItem key={index} value={category.id}>
+                    {category.name} 
+                  </MenuItem>
+                })
+              : "Something went wrong"}
+            </Select>
+          </FormControl>
+        ) : fetching ? (
+          "Loading Categories"
+        ) : null}
+
+        
+        <TextField
+          id="standard-full-width"
+          label="Name of case to be changed"
+          placeholder="Example Case Name"
+          fullWidth
+          margin="normal"
+          value={nameCase}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setNameCase(event.target.value);
+          }}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+
+
         <TextField
           id="standard-full-width"
           label="Name"
@@ -128,12 +165,7 @@ const AddCaseModal: React.FC<AddCaseModalProps> = (props) => {
                 setCategory(event.target.value as number);
               }}
             >
-              {/*
-                FEATURE 2 TODO:
-                Use the data from the result of the query ManagementContainerQuery - rendering categories as a drop down for users to select
-                to render a MenuItem with category id as the value, and the 
-                category name as the text.
-              */}
+            
               {data
                 ? data.category.map((category, index:number) => {
                   return <MenuItem key={index} value={category.id}>
@@ -142,7 +174,6 @@ const AddCaseModal: React.FC<AddCaseModalProps> = (props) => {
                 })
               : "Something went wrong"}
 
-              {/* END TODO */}
             </Select>
           </FormControl>
         ) : fetching ? (
@@ -154,10 +185,13 @@ const AddCaseModal: React.FC<AddCaseModalProps> = (props) => {
           variant="outlined"
           onClick={() => {
             executeMutation({
+              nameCase,
+              nameCat,
+              category_id: category,
               description,
               name,
               status,
-              category_id: category,
+              
             });
             props.onClose();
           }}
@@ -168,4 +202,4 @@ const AddCaseModal: React.FC<AddCaseModalProps> = (props) => {
     </StyledModal>
   );
 };
-export default AddCaseModal;
+export default EditCaseModal;
